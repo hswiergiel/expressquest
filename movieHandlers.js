@@ -56,7 +56,6 @@ const putMovie = (req, res) => {
       [title, director, year, color, duration, id]
     )
     .then(([result]) => {
-      console.log(result);
       if (result.affectedRows === 0) {
         res.status(404).send("Not Found");
       } else {
@@ -70,10 +69,32 @@ const putMovie = (req, res) => {
 
 }
 
+const deleteMovie = (req, res) => {
+  const id = parseInt(req.params.id);
+  database
+    .query(
+      "DELETE from movies WHERE id = ?",
+      [id]
+    )
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.status(404).send("Not Found");
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error deleting the movie");
+    });
+
+}
+
 module.exports = {
   getMovies,
   getMovieById,
   postMovie,
   putMovie,
+  deleteMovie
 };
 
