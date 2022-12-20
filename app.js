@@ -11,6 +11,23 @@ const welcome = (req, res) => {
   res.send("Welcome to my favourite movie list");
 };
 
+const Session = require("express-session");
+const FileStore = require("session-file-store")(Session);
+const path = require("path");
+
+app.use(
+  Session({
+    store: new FileStore({
+      path: path.join(__dirname, "/tmp"),
+      encrypt: true,
+    }),
+    secret: "Super Secret !",
+    resave: true,
+    saveUninitialized: true,
+    name: "sessionId",
+  })
+);
+
 app.get("/", welcome);
 
 const movieHandlers = require("./movieHandlers");
@@ -27,7 +44,13 @@ app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
 app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUserById);
-
+app.get("/api/session-in", (req, res) => {
+  req.session.song = "be bop a lula";
+  res.send("Toto");
+});
+app.get("/api/session-out", (req, res) => {
+  res.send(req.session.song);
+});
 app.post(
   "/api/users",
   validator.validateUser,
